@@ -1,0 +1,40 @@
+:root {
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f3f4f6;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Sidebar desktop visible por defecto, oculto en móvil */
+.sidebar-desktop {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bottom nav oculto en desktop, visible en móvil */
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .sidebar-desktop {
+    display: none !important;
+  }
+  .bottom-nav {
+    display: flex !important;
+  }
+}
