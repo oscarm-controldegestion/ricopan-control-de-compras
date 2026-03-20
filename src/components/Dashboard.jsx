@@ -60,7 +60,7 @@ export default function Dashboard() {
       const pedidosDeHoy = todosPedidos.filter(p => {
         const matchLocal = esAdmin || p.local === localNombre;
         const fecha = p.creadoEn?.toDate ? p.creadoEn.toDate() : null;
-        return matchLocal && fecha && fecha >= inicio && fecha <= fin;
+        return matchLocal && fecha && fecha >= inicio && fecha <= fin && !p.eliminado;
       });
 
       const facturasMiLocal = todasFacturas.filter(f =>
