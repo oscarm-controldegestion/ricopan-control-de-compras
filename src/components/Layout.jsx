@@ -42,7 +42,7 @@ export default function Layout({ children }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img
-            src="/ricopan-app/logo.png"
+            src="/ricopan-control-de-compras/logo.png"
             alt="Ricopan"
             style={{ height: '38px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
           />
