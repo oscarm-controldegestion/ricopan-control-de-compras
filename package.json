@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://oscar-munizaga.github.io/ricopan-app",
+  "homepage": "https://oscarm-controldegestion.github.io/ricopan-app",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
