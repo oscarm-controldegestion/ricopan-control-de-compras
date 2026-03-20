@@ -41,13 +41,14 @@ export default function Layout({ children }) {
         boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '24px' }}>🥖</span>
-          <div>
-            <div style={{ fontWeight: '700', fontSize: '17px', lineHeight: 1.2 }}>RICOPAN</div>
-            {userProfile?.local && (
-              <div style={{ fontSize: '11px', opacity: 0.85 }}>{userProfile.local}</div>
-            )}
-          </div>
+          <img
+            src="/ricopan-app/logo.png"
+            alt="Ricopan"
+            style={{ height: '38px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+          />
+          {userProfile?.local && (
+            <div style={{ fontSize: '11px', opacity: 0.85, color: 'white' }}>{userProfile.local}</div>
+          )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '13px', opacity: 0.9, maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
