@@ -41,8 +41,11 @@ export default function PedidoForm() {
     if (!nombre) return;
     setGuardandoProv(true);
     try {
-      await addDoc(collection(db, 'proveedores'), { nombre, activo: true, creadoEn: Timestamp.now() });
-      await cargarProveedores();
+      const docRef = await addDoc(collection(db, 'proveedores'), { nombre, activo: true, creadoEn: Timestamp.now() });
+      // Agregar directamente al estado local (sin recargar Firestore)
+      // para que la selección y la lista se actualicen en el mismo render
+      const nuevo = { id: docRef.id, nombre, activo: true };
+      setProveedores(prev => [...prev, nuevo].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')));
       setForm(prev => ({ ...prev, proveedor: nombre }));
       setNuevoProveedor('');
       setMostrarNuevo(false);
