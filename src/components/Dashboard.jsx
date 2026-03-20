@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, query, where, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { format, startOfDay, endOfDay } from 'date-fns';
@@ -41,48 +41,46 @@ export default function Dashboard() {
 
   async function cargarDatos() {
     setLoading(true);
-    const inicio = Timestamp.fromDate(startOfDay(hoy));
-    const fin = Timestamp.fromDate(endOfDay(hoy));
+    const inicio = startOfDay(hoy);
+    const fin = endOfDay(hoy);
 
     try {
-      // Pedidos de hoy
-      const qPedidos = query(
-        collection(db, 'pedidos'),
-        where('local', '==', localNombre),
-        where('creadoEn', '>=', inicio),
-        where('creadoEn', '<=', fin)
-      );
-      const snapPedidos = await getDocs(qPedidos);
-      const pedidosHoy = snapPedidos.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Traemos todo ordenado y filtramos en cliente (evita índices compuestos)
+      const [snapPedidos, snapFacturas] = await Promise.all([
+        getDocs(query(collection(db, 'pedidos'), orderBy('creadoEn', 'desc'))),
+        getDocs(query(collection(db, 'facturas'), orderBy('creadoEn', 'desc'))),
+      ]);
 
-      // Facturas pendientes
-      const qFacturas = query(
-        collection(db, 'facturas'),
-        where('local', '==', localNombre),
-        where('estado', 'in', ['pendiente_pago', 'pendiente_nc'])
-      );
-      const snapFacturas = await getDocs(qFacturas);
-      const facturasPendientes = snapFacturas.docs.map(d => ({ id: d.id, ...d.data() }));
+      const todosPedidos = snapPedidos.docs.map(d => ({ id: d.id, ...d.data() }));
+      const todasFacturas = snapFacturas.docs.map(d => ({ id: d.id, ...d.data() }));
 
-      // Ultimas facturas
-      const qUltFacturas = query(
-        collection(db, 'facturas'),
-        where('local', '==', localNombre),
-        orderBy('creadoEn', 'desc'),
-        limit(5)
+      // Filtrar por local (admin con 'Todos' ve todo)
+      const esAdmin = localNombre === 'Todos';
+
+      const pedidosDeHoy = todosPedidos.filter(p => {
+        const matchLocal = esAdmin || p.local === localNombre;
+        const fecha = p.creadoEn?.toDate ? p.creadoEn.toDate() : null;
+        return matchLocal && fecha && fecha >= inicio && fecha <= fin;
+      });
+
+      const facturasMiLocal = todasFacturas.filter(f =>
+        esAdmin || f.local === localNombre
       );
-      const snapUltFacturas = await getDocs(qUltFacturas);
+
+      const facturasPendientes = facturasMiLocal.filter(f =>
+        f.estado === 'pendiente_pago' || f.estado === 'pendiente_nc'
+      );
 
       setStats({
-        pedidos: pedidosHoy.length,
+        pedidos: pedidosDeHoy.length,
         facturas: facturasPendientes.length,
-        montoHoy: pedidosHoy.reduce((s, p) => s + (Number(p.monto) || 0), 0),
+        montoHoy: pedidosDeHoy.reduce((s, p) => s + (Number(p.monto) || 0), 0),
         pendientes: facturasPendientes.reduce((s, f) => s + (Number(f.monto) || 0), 0),
       });
-      setRecentPedidos(pedidosHoy.slice(0, 4));
-      setRecentFacturas(snapUltFacturas.docs.map(d => ({ id: d.id, ...d.data() })));
+      setRecentPedidos(pedidosDeHoy.slice(0, 4));
+      setRecentFacturas(facturasMiLocal.slice(0, 5));
     } catch (e) {
-      console.error(e);
+      console.error('Error cargando dashboard:', e);
     }
     setLoading(false);
   }
