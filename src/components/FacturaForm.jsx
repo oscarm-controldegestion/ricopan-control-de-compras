@@ -93,7 +93,7 @@ export default function FacturaForm() {
         const matchLocal = !local || local === 'Todos' || p.local === local;
         const fecha = p.creadoEn?.toDate ? p.creadoEn.toDate() : null;
         const matchFecha = fecha && fecha >= hace60dias;
-        return matchLocal && matchFecha;
+        return matchLocal && matchFecha && !p.eliminado;
       });
       setPedidosDisponibles(filtrados);
     } catch (e) {
@@ -136,6 +136,7 @@ export default function FacturaForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+    if (!pedidoSeleccionado) { setError('Debes vincular un pedido antes de registrar la factura.'); return; }
     if (!form.proveedor) { setError('Selecciona un proveedor'); return; }
     if (!form.monto || Number(form.monto) <= 0) { setError('Ingresa un monto válido'); return; }
 
@@ -188,7 +189,7 @@ export default function FacturaForm() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px' }}>←</button>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#111827', margin: 0 }}>Registrar Factura</h1>
+          <h1 style={{ fontSize: '22px', fontWeight: '700', color: '#111827', margin: 0 }}>Registrar Factura / Nota de Crédito</h1>
           <p style={{ color: '#6b7280', fontSize: '13px', margin: '2px 0 0' }}>{userProfile?.local}</p>
         </div>
       </div>
@@ -204,7 +205,7 @@ export default function FacturaForm() {
         <div style={{ marginBottom: '24px', padding: '16px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <label style={{ fontSize: '14px', fontWeight: '700', color: '#374151' }}>
-              🔗 Vincular a un pedido <span style={{ fontWeight: '400', color: '#9ca3af' }}>(opcional)</span>
+              🔗 Vincular a un pedido <span style={{ fontWeight: '600', color: '#dc2626' }}>*</span>
             </label>
             {!pedidoSeleccionado && (
               <button
