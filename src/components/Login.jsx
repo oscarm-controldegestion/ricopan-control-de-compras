@@ -57,16 +57,12 @@ export default function Login() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '72px', height: '72px',
-            background: 'linear-gradient(135deg, #b41e1e, #7a0e0e)',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 12px',
-            fontSize: '32px',
-          }}>🥖</div>
-          <h1 style={{ color: '#b41e1e', fontSize: '28px', fontWeight: '700', margin: 0 }}>RICOPAN</h1>
-          <p style={{ color: '#666', fontSize: '14px', margin: '6px 0 0' }}>Sistema de gestión de compras</p>
+          <img
+            src="/ricopan-app/logo.png"
+            alt="Ricopan"
+            style={{ height: '100px', width: 'auto', objectFit: 'contain', margin: '0 auto 8px', display: 'block' }}
+          />
+          <p style={{ color: '#999', fontSize: '13px', margin: '4px 0 0' }}>Sistema de gestión de compras</p>
         </div>
 
         {error && (
