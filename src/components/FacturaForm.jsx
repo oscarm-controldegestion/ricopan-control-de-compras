@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase';
+import { db, compressImageToBase64 } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -51,11 +50,9 @@ export default function FacturaForm() {
 
     setLoading(true);
     try {
-      let fotoURL = null;
+      let fotoBase64 = null;
       if (foto) {
-        const storageRef = ref(storage, `facturas/${userProfile.local}/${Date.now()}_${foto.name}`);
-        await uploadBytes(storageRef, foto);
-        fotoURL = await getDownloadURL(storageRef);
+        fotoBase64 = await compressImageToBase64(foto);
       }
 
       await addDoc(collection(db, 'facturas'), {
@@ -66,7 +63,7 @@ export default function FacturaForm() {
         fechaRecepcion: form.fechaRecepcion,
         estado: form.estado,
         observaciones: form.observaciones,
-        fotoURL,
+        fotoBase64,
         creadoEn: Timestamp.now(),
         creadoPor: currentUser.uid,
         registradoPor: userProfile.nombre || currentUser.email,

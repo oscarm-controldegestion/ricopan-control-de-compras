@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { collection, query, where, orderBy, getDocs, doc, updateDoc, Timestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase';
+import { db, compressImageToBase64 } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -35,11 +34,9 @@ function FacturaCard({ factura, onUpdate }) {
     if (!file) return;
     setUploading(true);
     try {
-      const storageRef = ref(storage, `comprobantes/${userProfile.local}/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+      const comprobanteBase64 = await compressImageToBase64(file);
       await updateDoc(doc(db, 'facturas', factura.id), {
-        comprobanteURL: url,
+        comprobanteBase64,
         estado: 'pagada',
         fechaPago: Timestamp.now(),
       });
@@ -94,25 +91,20 @@ function FacturaCard({ factura, onUpdate }) {
           )}
 
           {/* Foto factura */}
-          {factura.fotoURL && (
+          {factura.fotoBase64 && (
             <div style={{ marginBottom: '12px' }}>
               <p style={{ fontSize: '13px', fontWeight: '600', color: '#374151', margin: '0 0 6px' }}>📷 Factura:</p>
-              <a href={factura.fotoURL} target="_blank" rel="noopener noreferrer">
-                <img src={factura.fotoURL} alt="Factura" style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px' }} />
-              </a>
+              <img src={factura.fotoBase64} alt="Factura" style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer' }}
+                onClick={() => window.open(factura.fotoBase64)} />
             </div>
           )}
 
           {/* Comprobante pago */}
-          {factura.comprobanteURL ? (
+          {factura.comprobanteBase64 ? (
             <div style={{ marginBottom: '12px' }}>
               <p style={{ fontSize: '13px', fontWeight: '600', color: '#374151', margin: '0 0 6px' }}>✅ Comprobante de pago:</p>
-              <a href={factura.comprobanteURL} target="_blank" rel="noopener noreferrer" style={{
-                display: 'inline-block', padding: '8px 14px', background: '#d1fae5',
-                color: '#065f46', borderRadius: '8px', textDecoration: 'none', fontSize: '13px', fontWeight: '600',
-              }}>
-                Ver comprobante →
-              </a>
+              <img src={factura.comprobanteBase64} alt="Comprobante" style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer' }}
+                onClick={() => window.open(factura.comprobanteBase64)} />
             </div>
           ) : (factura.estado === 'pendiente_pago') && (
             <div style={{ marginBottom: '12px' }}>
