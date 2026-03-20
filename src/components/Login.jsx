@@ -43,6 +43,7 @@ export default function Login() {
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #b41e1e 0%, #7a0e0e 100%)',
       display: 'flex',
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
